@@ -34,9 +34,15 @@ module ActiveMerchant #:nodoc:
     #   cc.valid? # => true
     #   cc.display_number # => XXXX-XXXX-XXXX-4242
     #
+    # == Configuration
+    #
+    # Set ActiveMerchant::Billing::CreditCard.type_required = false if you dont want to send the credit card type
     class CreditCard
       include CreditCardMethods
       include Validateable
+      
+      ## Configuration
+      cattr_accessor :type_required
       
       ## Attributes
       
@@ -57,7 +63,11 @@ module ActiveMerchant #:nodoc:
       def expiry_date
         ExpiryDate.new(@month, @year)
       end
-
+      
+      def expiration
+        Date.new(@year.to_i, @month.to_i)
+      end
+      
       def expired?
         expiry_date.expired?
       end
@@ -125,6 +135,7 @@ module ActiveMerchant #:nodoc:
       end
       
       def validate_card_type #:nodoc:
+        return true if @@type_required == false
         errors.add :type, "is required" if type.blank?
         errors.add :type, "is invalid"  unless CreditCard.card_companies.keys.include?(type)
       end

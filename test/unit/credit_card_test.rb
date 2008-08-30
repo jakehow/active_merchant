@@ -98,6 +98,16 @@ class CreditCardTest < Test::Unit::TestCase
     assert_match /is required/, @visa.errors.on(:type)
     assert  @visa.errors.on(:type)
   end
+  
+  def test_should_be_able_to_build_date_from_valid_card
+    assert_equal @visa.expiration, Date.new(Time.now.year+1, 9)
+  end
+  
+  def test_should_be_valid_when_type_required_is_false
+    CreditCard.type_required = false
+    @visa.type = nil
+    assert_valid @visa
+  end
 
   def test_should_be_a_valid_card_number
     @visa.number = "4242424242424242"
